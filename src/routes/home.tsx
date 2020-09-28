@@ -1,27 +1,33 @@
-import Loadable from 'react-loadable';
 import React from 'react';
+import Loadable from 'react-loadable';
+import LoadingComponent from './loading-component';
+// interface IArguments {
+//   isLoading: boolean;
+//   error: any;
+// }
 
-interface IArguments {
-  isLoading: boolean;
-  error: any;
-}
+// export const Home = Loadable({
+//     loader: () => import("../views/home"),
+//     loading: LoadingComponent,
+// });
 
-const MyLoadingComponent = ({ isLoading, error }: IArguments) => {
-  // Handle the loading state
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  // Handle the error state
-  else if (error) {
-    return <div>Sorry, there was a problem loading the page.</div>;
-  } else {
-    return null;
-  }
+// export const HomeDetail = Loadable({
+//     loader: () => import("../views/home/detail"),
+//     loading: LoadingComponent,
+// });
+
+export const Home = () => <div>home</div>;
+export const HomeDetail = () => <div>detail</div>;
+
+const home = {
+  path: '/home',
+  component: Home,
+  routes: [
+    {
+      path: '/home/detail',
+      component: HomeDetail,
+    },
+  ],
 };
 
-const Home = Loadable({
-  loader: () => import('../views/home'),
-  loading: MyLoadingComponent,
-});
-
-export default Home;
+export default home;

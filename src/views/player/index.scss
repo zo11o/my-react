@@ -1,0 +1,259 @@
+@import '../../assets/styles/index.scss';
+
+#cool-player {
+  width: 100%;
+  background: $white;
+  position: relative;
+  .cool-player-avatar-placeholder {
+    width: 54px;
+    height: 54px;
+    background: #e4e4e4;
+    border-radius: 50%;
+  }
+}
+
+.cool-player-wrapper {
+  width: 100%;
+  height: 80px;
+  background: $white;
+  position: relative;
+  border-top: 1px solid $gray-200;
+  .cool-player-inner {
+    width: 60%;
+    margin: 0 auto 0 auto;
+    height: 80px;
+    position: relative;
+    background: $white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .cool-player-actions {
+    }
+    .cool-lyric-mini-wrapper {
+    }
+  }
+}
+.cool-player-control {
+  display: flex;
+  align-items: center;
+  color: $gray-600;
+  justify-content: space-between;
+  .cool-player-control-btn {
+    display: flex;
+    align-items: center;
+    .icon-prev,
+    .icon-next {
+      width: 30px;
+      height: 30px;
+      fill: currentColor;
+      overflow: hidden;
+    }
+    .icon-play,
+    .icon-pause {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+      overflow: hidden;
+    }
+  }
+}
+
+.cool-player-box {
+  width: 70%;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  background: $white;
+  .cool-player-list-mode-btn {
+  }
+  .cool-player-mode {
+  }
+  .picture-wrapper {
+    border-radius: 50%;
+    width: 72px;
+    height: 72px;
+    position: relative;
+    top: -2px;
+    flex-shrink: 0;
+    transform: all ease-in-out 0.3s;
+  }
+  .picture {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: $white;
+    flex-shrink: 0;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    font-size: 0;
+    .avatar {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: auto;
+    }
+  }
+  .circle-progress {
+    display: none;
+    position: absolute;
+    top: -3px;
+    right: 0;
+    bottom: 0;
+    left: -2px;
+    margin: auto;
+  }
+  .picture img {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+  }
+  .cool-player-audio-info {
+    width: 90%;
+    color: $gray-600;
+    font-size: 14px;
+    margin-left: 16px;
+    position: relative;
+    .cool-player-audio-name {
+      width: 60%;
+      position: absolute;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: $font-size-base;
+    }
+    .time {
+      display: flex;
+      justify-content: flex-end;
+      span {
+        margin: 0 2px;
+      }
+    }
+  }
+
+  .progress-wrapper {
+    width: 100%;
+    height: 4px;
+    padding: 10px 0;
+    cursor: pointer;
+    margin-top: 16px;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
+  .progress {
+    width: 100%;
+    background: $gray-200;
+    height: 4px;
+    position: relative;
+    border-radius: 5px;
+    .progress-buffered {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background-color: $gray-800;
+      border-radius: 5px;
+    }
+    .progress-played {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      border-radius: 5px;
+      .progress-action-point {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 2px #656565;
+        position: absolute;
+        right: -7px;
+        top: -5px;
+      }
+    }
+  }
+}
+
+// 音量控制
+.right-control {
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  width: 10%;
+  color: $gray-600;
+  .icon-mute,
+  .icon-volume {
+    width: 20px;
+    height: 20px;
+    line-height: 0;
+    fill: currentColor;
+  }
+  .icon-volume {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    float: right;
+  }
+
+  .volume-control-wrapper {
+    padding: 8px 0;
+    float: right;
+    width: 60%;
+    margin-left: 8px;
+    cursor: pointer;
+    background: $white;
+  }
+
+  .volume-control {
+    height: 4px;
+    border-radius: 5px;
+    background-color: $gray-700;
+    position: relative;
+
+    .volume-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: linear-gradient(90deg, #01e4ff, #017fff);
+      height: 4px;
+      border-radius: 5px;
+      .volume-progress-dot {
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        right: -6px;
+        top: -3px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 0 2px #656565;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 980px) {
+  .right-control {
+    width: 12%;
+  }
+}

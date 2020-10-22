@@ -2,7 +2,7 @@ import React from 'react';
 import './index.scss';
 import { Link } from 'react-router-dom';
 
-export default function Home() {
+export default function Home(props: any) {
   return (
     <div className="views-home">
       Home

@@ -57,6 +57,8 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
 
   // 是否暂停
   const [isPaused, setPause] = useState<boolean>(true);
+  // 是否播放中
+  const [isPlayed, setIsPlayed] = useState<boolean>(false);
   const [currentMusic, setCurrentMusic] = useState<coolPlayerTypes.IAudio>(
     currentAudio || (data && data[0]) || initialMusic
   );
@@ -72,6 +74,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     icons = {},
     actions = [],
     showLyricMini = false,
+    showLyricNormal = false,
+    volume = 0.5,
+    onPlayStatusChange,
     primaryColor = '#33beff',
     avatarPlaceholder = <div className={'cool-player-avatar-placeholder'}></div>,
   } = props;
@@ -93,6 +98,15 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     detailHide = IconDetailHide,
   } = icons;
 
+  // 首次加载执行
+  useEffect(() => {
+    console.log('首次加载执行');
+
+    // audioEl.current.addEventListener('canplay', setInitialTotalTime);
+    // volumeProgressEl.current.style.width = '50%';
+    // audioEl.current.voulume = volume;
+  }, []);
+
   /**
    * 下一首歌
    */
@@ -111,7 +125,25 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   /**
    * 播放
    */
-  const play = () => {};
+  const play = () => {
+    // console.log('播放')
+    if (!currentMusic || currentMusic.invalid || currentMusic.disabled) {
+      return;
+    }
+    setPause(false);
+    setIsPlayed(true);
+
+    // 判断是否没有数据
+    if (checkNoData()) {
+      return;
+    }
+
+    if (onPlayStatusChange) {
+      onPlayStatusChange(currentMusic, true);
+    }
+  };
+
+  const checkNoData = () => !currentAudio && !currentMusic && !data?.length;
 
   const onSwitchPlayMode = () => {
     const singleCycle = <div>{modeLoop}</div>;
@@ -129,13 +161,18 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     }
   };
 
+  /**
+   * 计算总时长
+   */
+  const setInitialTotalTime = () => {};
+
   return (
     <div id={'cool-player'} ref={coolPlayerEl}>
       <div className="cool-player-wrapper">
         <div className="cool-player-inner" ref={coolPlayerInnerEL}>
           <div className="cool-player-control" ref={playControlEl}>
             <div className="cool-player-control-btn">
-              <div className="icon-prev" onClick={() => last()} data-test={'prev-btn'}>
+              <div className="icon-prev" onClick={last} data-test={'prev-btn'}>
                 {prevIcon}
               </div>
               {!isPaused && currentMusic && currentMusic.src ? (

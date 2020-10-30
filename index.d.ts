@@ -6,14 +6,20 @@ declare namespace coolPlayerTypes {
     data?: IAudio[]
     /*需要播放的音频，可以控制当前播放器的音频，若不传入，播放器内待播放的音频默认为播放列表第一个音频*/
     currentAudio?: IAudio
+    /*音量*/
+    volume?: number
     /*主题颜色*/
     primaryColor?: string
     /*移动端状态下是否展示迷你歌词*/
     showLyricMini?: boolean
-        /*非移动端状态下，展示在播放器内部的操作组，在播放模式按钮与音量控制按钮之间*/
+    /*在非移动端状态下是否展示歌词*/
+    showLyricNormal?: boolean
+    /*非移动端状态下，展示在播放器内部的操作组，在播放模式按钮与音量控制按钮之间*/
     actions?: Array<(data: IAudio) => React.ReactNode>
     /*歌曲图片为空时歌曲图标的占位元素*/
     avatarPlaceholder?: React.ReactNode
+    /*切换播放和暂停触发的回调函数*/
+    onPlayStatusChange?: (currentMusic: IAudio, isPlayed: boolean) => void;
     /*自定义图标*/
     icons?: {
       /*控制播放列表显示或隐藏的图标*/

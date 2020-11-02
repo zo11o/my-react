@@ -2,6 +2,7 @@ import React from 'react';
 import './index.scss';
 import classnames from 'classnames';
 import { coolPlayerTypes } from '../../../index';
+import { getTime } from '../../utils/index';
 import {
   IconPlaylistPlaying,
   IconPlaylistPlay,
@@ -20,13 +21,13 @@ import {
 } from './icons';
 const { useState, useRef, useEffect } = React;
 
+let rotateTimer: NodeJS.Timeout;
 enum PlayMode {
   Order = 'order',
   Random = 'random',
   Loop = 'loop',
 }
 type PlayModeTypes = 'order' | 'random' | 'loop';
-
 const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const { data, currentAudio } = props;
 
@@ -45,15 +46,15 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const playControlEl = useRef(null);
   const musicBoxEl = useRef(null);
   const avatarEl = useRef(null);
-  const musicAvatarEl = useRef(null);
-  const bufferedEl = useRef(null);
-  const playedEl = useRef(null);
+  const musicAvatarEl = useRef<HTMLImageElement>(null);
+  const bufferedEl = useRef<HTMLDivElement>(null);
+  const playedEl = useRef<HTMLDivElement>(null);
   const actionsEl = useRef(null);
-  const volumeProgressEl = useRef(null);
+  const volumeProgressEl = useRef<HTMLDivElement>(null);
   // 播放器
-  const audioEl = useRef(null);
+  const audioEl = useRef<HTMLAudioElement>(null);
   const insideCircleEl = useRef(null);
-  const totalVolumeEl = useRef(null);
+  const totalVolumeEl = useRef<HTMLDivElement>(null);
 
   // 是否暂停
   const [isPaused, setPause] = useState<boolean>(true);
@@ -62,7 +63,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const [currentMusic, setCurrentMusic] = useState<coolPlayerTypes.IAudio>(
     currentAudio || (data && data[0]) || initialMusic
   );
-  // 计算剩余时间
+  // 计算已使用时间
   const [remainTime, setRemainTime] = useState<number | string>('00:00');
   // 总时间
   const [totalTime, setTotalTime] = useState<number | string>('00:00');
@@ -70,6 +71,17 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const [mode, setMode] = useState<PlayModeTypes>(PlayMode.Order);
   // 是否静音
   const [isMute, setIsMute] = useState<boolean>(false);
+  // 设置音量
+  const [volumeValue, setVolumeValue] = useState<number>(0);
+  // 进度条进度
+  const [playedLeft, setPlayedLeft] = useState<number>(0);
+  const [playedWidth, setPlayedWidth] = useState<number>(0);
+  const [volumeLeft, setVolumeLeft] = useState<number>(0);
+  const [playPercent, setPlayPercent] = useState<number>(0);
+  const [bufferedWidth, setBufferedWidth] = useState<number>(0);
+  // 旋转角度
+  const [angle, setAngle] = useState<number>(0);
+
   const {
     icons = {},
     actions = [],
@@ -101,11 +113,65 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   // 首次加载执行
   useEffect(() => {
     console.log('首次加载执行');
+    let audio = audioEl.current;
+    if (!audio) {
+      return;
+    }
+    audio.addEventListener('canplay', setInitialTotalTime);
+    audio.volume = volume;
 
-    // audioEl.current.addEventListener('canplay', setInitialTotalTime);
-    // volumeProgressEl.current.style.width = '50%';
-    // audioEl.current.voulume = volume;
+    let volumeProgress = volumeProgressEl.current;
+    if (volumeProgress) {
+      volumeProgress.style.width = '50%';
+    }
+    setVolumeValue(volume);
+    return () => {
+      audioEl.current?.removeEventListener('canplay', setInitialTotalTime);
+      audioEl.current?.removeEventListener('timeupdate', setProgress);
+    };
   }, []);
+
+  /**
+   * 暂停、播放更新状态
+   */
+  useEffect(() => {
+    const audio = audioEl.current;
+    if (!isPaused) {
+      audio?.play();
+    } else {
+      audio?.pause();
+    }
+    audio?.addEventListener('timeupdate', setProgress);
+
+    return () => {
+      audio?.removeEventListener('timeupdate', setProgress);
+    };
+  }, [isPaused, currentMusic, mode]);
+
+  useEffect(() => {
+    if (!isPaused) {
+      clearTimeout(rotateTimer);
+      if (!currentMusic || (currentMusic && currentMusic.disabled)) {
+        return;
+      }
+      rotate();
+    }
+
+    return () => {
+      clearTimeout(rotateTimer);
+    };
+  }, [angle, isPaused, currentMusic]);
+
+  // 头像旋转
+  const rotate = () => {
+    rotateTimer = setTimeout(() => {
+      rotate();
+      setAngle(angle + 1);
+      if (musicAvatarEl.current) {
+        musicAvatarEl.current.style.transform = `rotate(${angle}deg)`;
+      }
+    }, 25);
+  };
 
   /**
    * 下一首歌
@@ -115,12 +181,22 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   /**
    * 暂停
    */
-  const pause = () => {};
+  const pause = () => {
+    setPause(true);
+    if (onPlayStatusChange) {
+      onPlayStatusChange(currentMusic, false);
+    }
+  };
 
   /**
    * 下一首
    */
   const next = () => {};
+
+  /**
+   * 随机播放
+   */
+  const random = () => {};
 
   /**
    * 播放
@@ -164,7 +240,82 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   /**
    * 计算总时长
    */
-  const setInitialTotalTime = () => {};
+  const setInitialTotalTime = () => {
+    // 获取总时间
+    let audio = audioEl.current;
+    if (!audio) {
+      return;
+    }
+    const musicTotalTime = parseInt(String(audio.duration), 0);
+    // 计算总时间
+    setTotalTime(getTime(musicTotalTime));
+    // 计算已使用时间
+    setRemainTime(getTime(0));
+    if (playedEl.current) {
+      setPlayedLeft(playedEl.current.getBoundingClientRect().left);
+    }
+    console.log(totalVolumeEl.current);
+    if (totalVolumeEl.current) {
+      setVolumeLeft(totalVolumeEl.current.getBoundingClientRect().left);
+    }
+  };
+
+  const setProgress = () => {
+    if (!audioEl.current) {
+      return;
+    }
+    // 设置播放进度条
+    let playPer = audioEl.current?.currentTime / audioEl.current?.duration;
+    const { duration } = audioEl.current;
+    // 判断 NaN !== NaN
+    if (isNaN(duration)) {
+      playPer = 0;
+    }
+    setPlayPercent(playPer);
+    if (playedEl.current) {
+      playedEl.current.style.width = playPer * 100 + '%';
+    }
+    setPlayedWidth(playPer * 100);
+    // TODO: 详情
+
+    // 设置缓冲进度条
+    const timeRages = audioEl.current.buffered;
+    let bufferedTime = 0;
+    if (timeRages.length !== 0) {
+      bufferedTime = timeRages.end(timeRages.length - 1);
+      console.log(bufferedTime);
+    }
+    const bufferedPer = bufferedTime / audioEl.current.duration;
+
+    bufferedEl.current && (bufferedEl.current.style.width = bufferedPer * 100 + '%');
+    setBufferedWidth(bufferedPer * 100);
+    // 设置剩余时间
+    const musicRemainTime = parseInt(`${audioEl.current.currentTime}`, 0);
+    setTimeout(() => {
+      setRemainTime(getTime(musicRemainTime));
+    });
+
+    // 歌曲播放结束
+    if (audioEl.current.ended) {
+      clearTimeout(rotateTimer);
+      setPlayPercent(0);
+      playedEl.current && (playedEl.current.style.width = '0%');
+      setPlayedWidth(0);
+      // TODO: 详情
+      pause();
+      if (mode === PlayMode.Order) {
+        next();
+        play();
+      } else if (mode === PlayMode.Random) {
+        random();
+      } else if (mode === PlayMode.Loop) {
+        const currentMusicAgain = JSON.parse(JSON.stringify(currentMusic));
+        setCurrentMusic(currentMusicAgain);
+        play();
+      }
+      setAngle(0);
+    }
+  };
 
   return (
     <div id={'cool-player'} ref={coolPlayerEl}>

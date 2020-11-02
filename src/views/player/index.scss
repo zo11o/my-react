@@ -173,7 +173,7 @@
       top: 0;
       left: 0;
       height: 4px;
-      background-color: $gray-800;
+      background-color: $gray-400;
       border-radius: 5px;
     }
     .progress-played {
@@ -229,7 +229,7 @@
   .volume-control {
     height: 4px;
     border-radius: 5px;
-    background-color: $gray-700;
+    background-color: $gray-300;
     position: relative;
 
     .volume-progress {

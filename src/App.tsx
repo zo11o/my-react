@@ -14,6 +14,14 @@ function App() {
       id: '66575568141',
     },
     {
+      src:
+        'http://neroht.com/%E7%91%BE%E5%A7%9DHikari%20-%20%E8%B5%A4%E4%BC%B6%EF%BC%88Cover%EF%BC%9AHITA%EF%BC%89.mp3',
+      artist: '瑾姝Hikari',
+      name: '赤伶',
+      img: 'http://neroht.com/chiling.jpg',
+      id: '66575568443',
+    },
+    {
       src: 'http://neroht.com/Take%20Your%20Time%20%20-%20alexandr.mp3',
       artist: 'Alexandr',
       name: 'Take Your Time',
@@ -33,6 +41,7 @@ function App() {
         onPlayStatusChange={(currentAudio: coolPlayerTypes.IAudio, isPlayed: boolean) => {
           setPlaying(isPlayed);
         }}
+        play={playing}
       ></Player>
     </div>
   );

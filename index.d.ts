@@ -5,7 +5,8 @@ declare namespace coolPlayerTypes {
     /*播放列表的音频数据*/
     data?: IAudio[]
     /*需要播放的音频，可以控制当前播放器的音频，若不传入，播放器内待播放的音频默认为播放列表第一个音频*/
-    currentAudio?: IAudio
+    currentAudio?: IAudio    /*是否开始播放*/
+    play?: boolean
     /*音量*/
     volume?: number
     /*主题颜色*/
@@ -18,6 +19,8 @@ declare namespace coolPlayerTypes {
     actions?: Array<(data: IAudio) => React.ReactNode>
     /*歌曲图片为空时歌曲图标的占位元素*/
     avatarPlaceholder?: React.ReactNode
+    /*音量变化时的回调函数*/
+    onVolumeChange?: (volume: number) => void
     /*切换播放和暂停触发的回调函数*/
     onPlayStatusChange?: (currentMusic: IAudio, isPlayed: boolean) => void;
     /*自定义图标*/
@@ -49,7 +52,7 @@ declare namespace coolPlayerTypes {
       /*静音*/
       muteIcon?: React.ReactNode
       /*隐藏播放详情*/
-      detailHide?: React.ReactNode
+      detailHide?: React.ReactNode,
     }
   }
 

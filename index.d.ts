@@ -19,10 +19,13 @@ declare namespace coolPlayerTypes {
     actions?: Array<(data: IAudio) => React.ReactNode>
     /*歌曲图片为空时歌曲图标的占位元素*/
     avatarPlaceholder?: React.ReactNode
+    /*便于外部控制播放详情的显示与隐藏*/
+    playDetailShow?: boolean
     /*音量变化时的回调函数*/
     onVolumeChange?: (volume: number) => void
     /*切换播放和暂停触发的回调函数*/
-    onPlayStatusChange?: (currentMusic: IAudio, isPlayed: boolean) => void;
+    onPlayStatusChange?: (currentMusic: IAudio, isPlayed: boolean) => void
+    onPlayDetailStatusChange?:(status: boolean) => void
     /*自定义图标*/
     icons?: {
       /*控制播放列表显示或隐藏的图标*/

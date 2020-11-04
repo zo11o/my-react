@@ -2,7 +2,7 @@ import React from 'react';
 import './index.scss';
 import classnames from 'classnames';
 import { coolPlayerTypes } from '../../../index';
-import { getTime } from '../../utils/index';
+import { fixedBody, looseBody, getTime } from '../../utils/index';
 import {
   IconPlaylistPlaying,
   IconPlaylistPlay,
@@ -46,6 +46,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const playControlEl = useRef(null);
   const musicBoxEl = useRef(null);
   const avatarEl = useRef(null);
+  const detailPlayedEl = useRef(null);
   const musicAvatarEl = useRef<HTMLImageElement>(null);
   const bufferedEl = useRef<HTMLDivElement>(null);
   const playedEl = useRef<HTMLDivElement>(null);
@@ -56,6 +57,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const audioEl = useRef<HTMLAudioElement>(null);
   const insideCircleEl = useRef(null);
   const totalVolumeEl = useRef<HTMLDivElement>(null);
+  const coolPlayListWrapper = useRef<HTMLDivElement>(null);
 
   // 是否暂停
   const [isPaused, setPause] = useState<boolean>(true);
@@ -84,6 +86,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const [detailVisible, setDetailVisible] = useState<boolean>(false);
   // 旋转角度
   const [angle, setAngle] = useState<number>(0);
+  const [musicListShow, setMusicListShow] = useState<boolean>(false);
 
   const {
     icons = {},
@@ -96,6 +99,8 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     avatarPlaceholder = <div className={'cool-player-avatar-placeholder'}></div>,
     play: beginPlay,
     onVolumeChange,
+    playDetailShow = false,
+    onPlayDetailStatusChange,
   } = props;
 
   const {
@@ -146,6 +151,17 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       pause();
     }
   }, [beginPlay]);
+
+  /**
+   * 播放详情
+   */
+  useEffect(() => {
+    if (playDetailShow) {
+      onShowDetail();
+    } else {
+      onHideDetailShow();
+    }
+  }, [playDetailShow]);
 
   /**
    * 设置当前歌曲
@@ -205,10 +221,75 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     }, 25);
   };
 
+  const onToggleMute = () => {
+    if (isMute) {
+      setIsMute(false);
+      audioEl.current && (audioEl.current.volume = volumeValue);
+      onVolumeChange && onVolumeChange(volumeValue);
+    } else {
+      setIsMute(true);
+      audioEl.current && (audioEl.current.volume = 0);
+      onVolumeChange && onVolumeChange(0);
+    }
+  };
+
+  const onShowDetail = () => {
+    if (document.body.clientWidth > 600) {
+      return;
+    }
+    fixedBody();
+    setDetailVisible(true);
+    if (onPlayDetailStatusChange) {
+      onPlayDetailStatusChange(true);
+    }
+    setTimeout(() => {
+      if (detailPlayedEl.current) {
+        // setDetailPlayed()
+      }
+    });
+  };
+
+  const onHideDetailShow = () => {
+    looseBody();
+    setDetailVisible(false);
+    if (onPlayDetailStatusChange) {
+      onPlayDetailStatusChange(false);
+    }
+  };
+
   /**
-   * 下一首歌
+   * 上一首歌
    */
-  const last = () => {};
+  const last = (index?: number) => {
+    if (checkNoData()) {
+      return;
+    }
+
+    setAngle(0);
+    // TODO:设置歌词
+    // setLyricIndex(-1);
+
+    if (!currentMusic || !currentMusic.src) {
+      return;
+    }
+
+    let current;
+    current = index || data.findIndex((item) => item.src === currentMusic.src);
+    if (current > 0) {
+      if (data[current - 1].disabled) {
+        last(current - 1);
+        return;
+      }
+      setCurrentMusic(data[current - 1]);
+    } else {
+      let prevIndex = data.length - 1;
+      if (data[prevIndex].disabled) {
+        last(prevIndex);
+        return;
+      }
+      setCurrentMusic(data[prevIndex]);
+    }
+  };
 
   /**
    * 暂停
@@ -319,6 +400,10 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     }
   };
 
+  const showMusicList = () => {
+    setMusicListShow(!musicListShow);
+  };
+
   const setProgress = () => {
     if (!audioEl.current) {
       return;
@@ -390,6 +475,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     if (volumeRate > 0.01 && volumeRate <= 1) {
       audio.volume = volumeRate;
       currentVolume = volumeRate;
+      if (volumeProgressEl.current) {
+        volumeProgressEl.current.style.width = volumeRate * 100 + '%';
+      }
     } else if (volumeRate <= 0.01) {
       audio.volume = 0;
       currentVolume = 0;
@@ -452,22 +540,36 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     }
   };
 
-  const onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!e.pageX) {
-      return;
+  const slideChangeTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (mouseDown) {
+      setTimeOnPc(e);
     }
-    setMouseDown(true);
-    setTimeOnPc(e);
+  };
+
+  const clickChangeVolume = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    setVolume(e.pageX);
   };
 
   const mouseDownVolume = () => {
     setMouseDown(true);
   };
 
-  const slideChangeTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const slideChangeVolume = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (mouseDown) {
-      setTimeOnPc(e);
+      setVolume(e.pageX);
     }
+  };
+
+  const mouseUpVolume = () => {
+    setMouseDown(false);
+  };
+
+  const onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!e.pageX) {
+      return;
+    }
+    setMouseDown(true);
+    setTimeOnPc(e);
   };
 
   const onMouseUp = () => {
@@ -484,7 +586,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
         <div className="cool-player-inner" ref={coolPlayerInnerEL}>
           <div className="cool-player-control" ref={playControlEl}>
             <div className="cool-player-control-btn">
-              <div className="icon-prev" onClick={last} data-test={'prev-btn'}>
+              <div className="icon-prev" onClick={() => last()} data-test={'prev-btn'}>
                 {prevIcon}
               </div>
               {!isPaused && currentMusic && currentMusic.src ? (
@@ -581,7 +683,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
               )}
             </div>
             <div className="cool-player-list-mode-btn">
-              <div className="icon-menu">{playListIcon}</div>
+              <div className="icon-menu" onClick={showMusicList}>
+                {playListIcon}
+              </div>
               <div className="cool-player-mode">
                 <div className="mode">{onSwitchPlayMode()}</div>
               </div>
@@ -597,14 +701,23 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
             {
               // 静音
               isMute ? (
-                <div className={'icon-mute'} onClick={() => {}}>
+                <div className={'icon-mute'} onClick={onToggleMute}>
                   {volumeIcon}
                 </div>
               ) : (
-                <div className={'icon-volume'}>{muteIcon}</div>
+                <div className={'icon-volume'} onClick={onToggleMute}>
+                  {muteIcon}
+                </div>
               )
             }
-            <div className="volume-control-wrapper" onMouseDown={mouseDownVolume}>
+            <div
+              className="volume-control-wrapper"
+              onMouseDown={mouseDownVolume}
+              onClick={clickChangeVolume}
+              onMouseMove={slideChangeVolume}
+              onMouseUp={mouseUpVolume}
+              onMouseLeave={mouseLeave}
+            >
               <div className="volume-control" ref={totalVolumeEl}>
                 <div className="volume-progress" ref={volumeProgressEl} style={{ background: primaryColor }}>
                   <div className="volume-progress-dot"></div>
@@ -615,6 +728,11 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
           <audio src={currentMusic && currentMusic.src ? currentMusic.src : ''} ref={audioEl} />
         </div>
       </div>
+
+      {/* 歌词详情Modal */}
+      {/* <div className="cool-player-list-wrapper" ref={coolPlayListWrapper}>
+        
+      </div> */}
     </div>
   );
 };

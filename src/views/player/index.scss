@@ -281,6 +281,38 @@
   }
 }
 
+.cool-player-list-wrapper {
+  height: 88px;
+  background: $white;
+  position: absolute;
+  width: 60%;
+  left: 49%;
+  margin-left: -30%;
+}
+
+// 播放列表
+.cool-player-list-lyric {
+  width: 100%;
+  margin-left: -32.5%;
+  font-size: 14px;
+  top: -320px;
+}
+
+.cool-player-list-show-enter {
+  top: 20px;
+}
+.cool-player-list-show-enter.cool-player-list-show-enter-active {
+  top: -402px;
+  transition: all 300ms ease-in;
+}
+.cool-player-list-show-leave {
+  top: -402px;
+}
+.cool-player-list-show-leave.cool-player-list-show-leave-active {
+  top: 20px;
+  transition: all 300ms ease-in;
+}
+
 @media screen and (max-width: 980px) {
   .right-control {
     width: 12%;

@@ -20,6 +20,7 @@ import {
   IconDelete,
 } from './icons';
 const { useState, useRef, useEffect } = React;
+const CSSTransitionGroup = require('react-addons-css-transition-group');
 
 let rotateTimer: NodeJS.Timeout;
 enum PlayMode {
@@ -58,6 +59,8 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const insideCircleEl = useRef(null);
   const totalVolumeEl = useRef<HTMLDivElement>(null);
   const coolPlayListWrapper = useRef<HTMLDivElement>(null);
+  // 歌曲详情
+  const playListEl = useRef<HTMLDivElement>(null);
 
   // 是否暂停
   const [isPaused, setPause] = useState<boolean>(true);
@@ -101,6 +104,11 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     onVolumeChange,
     playDetailShow = false,
     onPlayDetailStatusChange,
+    playListPlaceholder = 'No Data',
+    playListHeader = {
+      headerLeft: 'Play List',
+      headerRight: '',
+    },
   } = props;
 
   const {
@@ -159,7 +167,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     if (playDetailShow) {
       onShowDetail();
     } else {
-      onHideDetailShow();
+      onHideDetail();
     }
   }, [playDetailShow]);
 
@@ -171,6 +179,10 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       setCurrentMusic(currentAudio);
     }
   }, [currentAudio]);
+
+  useEffect(() => {
+    console.log(document.body.clientWidth);
+  }, [document.body.clientWidth]);
 
   /**
    * 设置音量
@@ -249,7 +261,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     });
   };
 
-  const onHideDetailShow = () => {
+  const onHideDetail = () => {
     looseBody();
     setDetailVisible(false);
     if (onPlayDetailStatusChange) {
@@ -730,9 +742,28 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       </div>
 
       {/* 歌词详情Modal */}
-      {/* <div className="cool-player-list-wrapper" ref={coolPlayListWrapper}>
-        
-      </div> */}
+      <div className="cool-player-list-wrapper" ref={coolPlayListWrapper}>
+        <CSSTransitionGroup
+          transitionName="cool-player-list-show"
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={300}
+        >
+          {musicListShow ? (
+            <div className="cool-player-list-lyric" ref={playListEl}>
+              <div
+                className={classnames('cool-player-list-component', {
+                  'cool-player-list-component-half': showLyricNormal,
+                })}
+              >
+                <div className="cool-player-list-title">{playListHeader.headerLeft}</div>
+                <div className="cool-player-list-title-left">{playListHeader.headerRight}</div>
+              </div>
+            </div>
+          ) : (
+            <div className={'play-list-placeholder'}>{playListPlaceholder}</div>
+          )}
+        </CSSTransitionGroup>
+      </div>
     </div>
   );
 };

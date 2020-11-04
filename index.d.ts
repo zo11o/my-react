@@ -21,11 +21,16 @@ declare namespace coolPlayerTypes {
     avatarPlaceholder?: React.ReactNode
     /*便于外部控制播放详情的显示与隐藏*/
     playDetailShow?: boolean
+    playListPlaceholder?: string
     /*音量变化时的回调函数*/
     onVolumeChange?: (volume: number) => void
     /*切换播放和暂停触发的回调函数*/
     onPlayStatusChange?: (currentMusic: IAudio, isPlayed: boolean) => void
     onPlayDetailStatusChange?:(status: boolean) => void
+    playListHeader?: {
+      headerLeft?: React.ReactNode | string,
+      headerRight?: React.ReactNode | string
+    }
     /*自定义图标*/
     icons?: {
       /*控制播放列表显示或隐藏的图标*/

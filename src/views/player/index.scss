@@ -1,6 +1,7 @@
 @import '../../assets/styles/index.scss';
 
 #cool-player {
+  z-index: 1000;
   width: 100%;
   background: $white;
   position: relative;
@@ -292,10 +293,142 @@
 
 // 播放列表
 .cool-player-list-lyric {
-  width: 100%;
-  margin-left: -32.5%;
-  font-size: 14px;
-  top: -320px;
+  position: absolute;
+  right: 0;
+  top: -402px;
+  margin-left: -12%;
+  width: 98%;
+  height: 320px;
+  background: $white;
+  border: 1px solid $gray-300;
+  color: $gray-600;
+  display: flex;
+  align-items: flex-start;
+  font-size: 12px;
+  .cool-player-list-component {
+    width: 100%;
+  }
+  .cool-player-list-component-half {
+    width: 50%;
+  }
+  .cool-player-list-title {
+    height: 40px;
+    line-height: 40px;
+    // width: 90%;
+    padding: 0 5%;
+    background: $white;
+    border-bottom: 1px solid $gray-200;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cool-player-audio-wrapper {
+    overflow: auto;
+    height: 260px;
+    padding-bottom: 40px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    .cool-player-audio-del {
+      svg {
+        width: 18px;
+        height: 30px;
+        fill: currentColor;
+        // padding-top: 12px;
+      }
+    }
+  }
+  .play-list-placeholder {
+    height: 260px;
+    padding-bottom: 40px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 240px;
+  }
+
+  .cool-player-audio {
+    height: 36px;
+    line-height: 36px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    .cool-player-audio-left {
+      width: 40%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .cool-player-audio-right {
+      width: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      .cool-player-disabled-reason {
+        margin-right: $padding-base;
+      }
+    }
+    .cool-player-audio-name,
+    .cool-player-audio-artist {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    &:hover {
+      background: $gray-200;
+      .cool-player-audio-actions-content {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+    }
+  }
+  .cool-player-audio-actions-content {
+    margin-right: $padding-base;
+    display: none;
+  }
+  .cool-player-audio-actions-active {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .cool-player-audio-play {
+    width: 10%;
+    text-align: left;
+    margin-right: 10px;
+    line-height: 0;
+    .icon-playing,
+    .icon-play {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      overflow: hidden;
+    }
+  }
+  .cool-player-audio-name {
+    width: 90%;
+    text-align: left;
+  }
+  .cool-player-audio-artist {
+    width: 40%;
+    text-align: left;
+  }
+  .cool-player-audio-del {
+    width: 10%;
+    text-align: center;
+  }
+  .cool-player-audio-disabled {
+    color: $gray-500;
+    &:hover {
+      background: none;
+    }
+  }
 }
 
 .cool-player-list-show-enter {

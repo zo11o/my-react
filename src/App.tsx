@@ -3,6 +3,7 @@ import Player from './views/player';
 
 import { coolPlayerTypes } from '../index';
 import classnames from 'classnames';
+import './index.scss';
 
 function App() {
   const [data, setData] = useState([
@@ -41,7 +42,8 @@ function App() {
   ]);
 
   const [noActionsShow, setNoActionsShow] = useState<boolean>(false);
-
+  const [playing, setPlaying] = useState<boolean>(false);
+  const [playListShow, setPlayListShow] = useState<boolean>(false);
   const noActions = () => {
     setNoActionsShow(true);
     setTimeout(() => {
@@ -105,20 +107,37 @@ function App() {
     },
   ];
 
-  const [playing, setPlaying] = useState<boolean>(false);
+  const onPlayListHide = () => {
+    setPlayListShow(false);
+  };
 
   return (
     <div className="App">
-      <Player
-        data={data}
-        showLyricNormal={true}
-        actions={actions}
-        onPlayStatusChange={(currentAudio: coolPlayerTypes.IAudio, isPlayed: boolean) => {
-          setPlaying(isPlayed);
-        }}
-        play={playing}
-        playDetailShow={false}
-      ></Player>
+      <div className="player-wrap">
+        <Player
+          data={data}
+          showLyricNormal={true}
+          actions={actions}
+          onPlayStatusChange={(currentAudio: coolPlayerTypes.IAudio, isPlayed: boolean) => {
+            setPlaying(isPlayed);
+          }}
+          play={playing}
+          playDetailShow={false}
+          playListShow={playListShow}
+          onPlayListStatusChange={(status: boolean) => {
+            setPlayListShow(status);
+          }}
+          playListHeader={{
+            headerLeft: 'Play List',
+            headerRight: (
+              <span onClick={onPlayListHide} className={'close-play-list'}>
+                Close
+              </span>
+            ),
+          }}
+          showLyricMini={true}
+        ></Player>
+      </div>
     </div>
   );
 }

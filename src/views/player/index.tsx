@@ -104,11 +104,14 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     onVolumeChange,
     playDetailShow = false,
     onPlayDetailStatusChange,
+    onPlayListStatusChange,
     playListPlaceholder = 'No Data',
     playListHeader = {
       headerLeft: 'Play List',
       headerRight: '',
     },
+    playListAudioActions = [],
+    playListShow = false,
   } = props;
 
   const {
@@ -159,6 +162,11 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       pause();
     }
   }, [beginPlay]);
+
+  useEffect(() => {
+    console.log(22);
+    setMusicListShow(playListShow);
+  }, [playListShow]);
 
   /**
    * 播放详情
@@ -414,6 +422,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
 
   const showMusicList = () => {
     setMusicListShow(!musicListShow);
+    if (onPlayListStatusChange) {
+      onPlayListStatusChange(!musicListShow);
+    }
   };
 
   const setProgress = () => {
@@ -592,6 +603,15 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     setMouseDown(false);
   };
 
+  const playThis = (index?: number) => {};
+
+  /**
+   * TODO: 详情删除歌曲
+   */
+  const delMusic = (i: number, id: string) => {};
+
+  const playMode = () => {};
+
   return (
     <div id={'cool-player'} ref={coolPlayerEl}>
       <div className="cool-player-wrapper">
@@ -699,7 +719,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
                 {playListIcon}
               </div>
               <div className="cool-player-mode">
-                <div className="mode">{onSwitchPlayMode()}</div>
+                <div className="mode" onClick={playMode}>
+                  {onSwitchPlayMode()}
+                </div>
               </div>
             </div>
           </div>
@@ -755,13 +777,100 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
                   'cool-player-list-component-half': showLyricNormal,
                 })}
               >
-                <div className="cool-player-list-title">{playListHeader.headerLeft}</div>
-                <div className="cool-player-list-title-left">{playListHeader.headerRight}</div>
+                <div className="cool-player-list-title">
+                  <div className="cool-player-list-title-left">{playListHeader.headerLeft}</div>
+                  <div className="cool-player-list-title-left">{playListHeader.headerRight}</div>
+                </div>
+                {data && data.length ? (
+                  <div className="cool-player-audio-wrapper">
+                    {data.map((v, i) => {
+                      return v.disabled ? (
+                        <div className="cool-player-audio cool-player-audio-disabled" key={v.id}>
+                          <div className={'cool-player-audio-left'}>
+                            <div className="cool-player-audio-play">
+                              <div className={'icon-play'}>{playListPlay}</div>
+                            </div>
+                            <div className="cool-player-audio-name" title={v.name}>
+                              {v.name}
+                            </div>
+                          </div>
+                          <div className={'cool-player-audio-right'}>
+                            {v.disabled && v.disableReason && (
+                              <div className={'cool-player-disabled-reason'}>{v.disableReason}</div>
+                            )}
+                            <div className="cool-player-audio-artist">{v.artist}</div>
+                            <div className="cool-player-audio-del" onClick={() => delMusic(i, v.id)}>
+                              {deleteIcon}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className={'cool-player-audio'}
+                          style={
+                            currentMusic && currentMusic.src === v.src && isPlayed
+                              ? { background: primaryColor, color: '#fff' }
+                              : {}
+                          }
+                          key={v.id}
+                        >
+                          <div className={'cool-player-audio-left'}>
+                            <div className="cool-player-audio-play">
+                              {currentMusic && currentMusic.src === v.src && isPlayed ? (
+                                <div className="icon-playing">{playListPlaying}</div>
+                              ) : (
+                                <div className="icon-play" onClick={() => playThis(i)}>
+                                  {playListPlay}
+                                </div>
+                              )}
+                            </div>
+                            <div className="cool-player-audio-name" onClick={() => playThis(i)} title={v.name}>
+                              {v.name}
+                            </div>
+                          </div>
+                          <div className="cool-player-audio-right">
+                            {playListAudioActions.length ? (
+                              <div
+                                className="cool-play-audio-actions"
+                                onClick={() => {
+                                  if (currentMusic.id !== v.id || !isPlayed) {
+                                    playThis(i);
+                                  }
+                                }}
+                              >
+                                <div
+                                  className={classnames('cool-player-audio-actions-content', {
+                                    'cool-player-audio-actions-active':
+                                      currentMusic && currentMusic.id === v.id && isPlayed,
+                                  })}
+                                >
+                                  {playListAudioActions.map((item) =>
+                                    item(v, (currentMusic && currentMusic.id === v.id) || false)
+                                  )}
+                                </div>
+                              </div>
+                            ) : null}
+                            <div className="cool-player-audio-artist" onClick={() => playThis(i)}>
+                              {v.artist}
+                            </div>
+                            <div
+                              className="cool-player-audio-del"
+                              onClick={() => delMusic(i, v.id)}
+                              data-test={'icon-delete'}
+                            >
+                              {deleteIcon}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className={'play-list-placeholder'}>{playListPlaceholder}</div>
+                )}
               </div>
             </div>
-          ) : (
-            <div className={'play-list-placeholder'}>{playListPlaceholder}</div>
-          )}
+          ) : null}
         </CSSTransitionGroup>
       </div>
     </div>

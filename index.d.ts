@@ -1,4 +1,5 @@
 import React from 'react'
+import LyricMini from './src/components/lyricMini'
 
 declare namespace coolPlayerTypes {
   interface IPlayerProps {
@@ -23,6 +24,10 @@ declare namespace coolPlayerTypes {
     playDetailShow?: boolean
     playListShow?: boolean
     playListPlaceholder?: string
+    // 异步加载歌词时，传入歌词数据
+    lyric?: string
+    zIndex?: number
+    onAudioChange?: (id: string, currentMusic: IAudio) => void
     /*音量变化时的回调函数*/
     onVolumeChange?: (volume: number) => void
     /*切换播放和暂停触发的回调函数*/
@@ -88,6 +93,35 @@ declare namespace coolPlayerTypes {
     disabled?: boolean
     /*禁用的原因*/
     disableReason?: string | React.ReactNode
+  }
+
+  interface ILyric {
+    // 当前歌词时间
+    time: number | string
+    // 歌词文字
+    lyric: string
+  }
+
+  interface ITLyric {
+    [key: number]: string
+    [key: string]: string
+  }
+
+  namespace lyricDetail {
+
+  }
+
+  namespace LyricMini {
+    interface ILyricMiniProps {
+      // 歌词
+      lyric: ILyric[]
+      // 与当前歌词播放时间匹配的歌词index
+      lyricIndex: number
+    }
+  }
+
+  namespace lyricNormal {
+    
   }
 }
 

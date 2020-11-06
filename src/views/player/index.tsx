@@ -2,7 +2,7 @@ import React from 'react';
 import './index.scss';
 import classnames from 'classnames';
 import { coolPlayerTypes } from '../../../index';
-import { fixedBody, looseBody, getTime } from '../../utils/index';
+import { fixedBody, looseBody, getTime, getLyric } from '../../utils/index';
 import {
   IconPlaylistPlaying,
   IconPlaylistPlay,
@@ -19,6 +19,7 @@ import {
   IconDetailHide,
   IconDelete,
 } from './icons';
+import LyricMini from '../../components/lyricMini';
 const { useState, useRef, useEffect } = React;
 const CSSTransitionGroup = require('react-addons-css-transition-group');
 
@@ -56,7 +57,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const progressEl = useRef<HTMLDivElement>(null);
   // 播放器
   const audioEl = useRef<HTMLAudioElement>(null);
-  const insideCircleEl = useRef(null);
+  const insideCircleEl = useRef<SVGCircleElement>(null);
   const totalVolumeEl = useRef<HTMLDivElement>(null);
   const coolPlayListWrapper = useRef<HTMLDivElement>(null);
   // 歌曲详情
@@ -91,12 +92,16 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const [angle, setAngle] = useState<number>(0);
   const [musicListShow, setMusicListShow] = useState<boolean>(false);
 
+  const [lyric, setLyric] = useState<coolPlayerTypes.ILyric[]>([]);
+  const [lyricIndex, setLyricIndex] = useState<number>(-1);
+
   const {
     icons = {},
     actions = [],
     showLyricMini = false,
     showLyricNormal = false,
     volume = 0.5,
+    lyric: lyricFromProps = '',
     onPlayStatusChange,
     primaryColor = '#33beff',
     avatarPlaceholder = <div className={'cool-player-avatar-placeholder'}></div>,
@@ -105,6 +110,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     playDetailShow = false,
     onPlayDetailStatusChange,
     onPlayListStatusChange,
+    onAudioChange,
     playListPlaceholder = 'No Data',
     playListHeader = {
       headerLeft: 'Play List',
@@ -130,6 +136,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     muteIcon = IconMute,
     detailHide = IconDetailHide,
   } = icons;
+
+  let lyricList: coolPlayerTypes.ILyric[] = getLyric((currentMusic && currentMusic.lyric) || lyricFromProps);
+  let indexArr: number[] = [];
 
   // 首次加载执行
   useEffect(() => {
@@ -169,6 +178,13 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   }, [playListShow]);
 
   /**
+   * 控制模态框zIndex
+   */
+  useEffect(() => {
+    const { zIndex = 1000 } = props;
+  }, [musicListShow]);
+
+  /**
    * 播放详情
    */
   useEffect(() => {
@@ -178,6 +194,46 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       onHideDetail();
     }
   }, [playDetailShow]);
+
+  useEffect(() => {
+    console.log('currentMusic');
+    if (currentMusic) {
+      if (insideCircleEl.current) {
+        insideCircleEl.current.setAttribute('stroke-dasharray', '0,10000');
+      }
+    }
+
+    if (props.onAudioChange && currentMusic) {
+      props.onAudioChange(currentMusic.id, currentMusic);
+    }
+
+    setLyricIndex(-1);
+    setLyric([]);
+    setAngle(0);
+  }, [currentMusic]);
+
+  /**
+   * 清除缓冲条
+   */
+  useEffect(() => {
+    if (playedEl.current) {
+      playedEl.current.style.width = '0%';
+    }
+    if (bufferedEl.current) {
+      bufferedEl.current.style.width = '0%';
+    }
+  }, [currentMusic]);
+
+  useEffect(() => {
+    const audio = audioEl.current;
+    lyricList = getLyric((currentMusic && currentMusic.lyric) || lyricFromProps);
+    indexArr = [];
+    setLyric(lyricList);
+    audio?.addEventListener('timeupdate', setLyricHighLight);
+    return () => {
+      audioEl.current?.removeEventListener('timeupdate', setLyricHighLight);
+    };
+  }, [currentMusic, lyricFromProps]);
 
   /**
    * 设置当前歌曲
@@ -229,6 +285,23 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
       clearTimeout(rotateTimer);
     };
   }, [angle, isPaused, currentMusic]);
+
+  const setLyricHighLight = () => {
+    if (!audioEl.current) {
+      return;
+    }
+    const current = audioEl.current.currentTime;
+    if ((currentMusic && currentMusic.lyric) || lyricFromProps) {
+      lyricList.forEach((item, index) => {
+        if (item && lyricList[index - 1]) {
+          if (current >= item.time) {
+            indexArr.push(index);
+          }
+        }
+      });
+      setLyricIndex(indexArr[indexArr.length - 1]);
+    }
+  };
 
   // 头像旋转
   const rotate = () => {
@@ -536,7 +609,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
         playedEl.current.style.width = newWidth * 100 + '%';
       }
       audio.currentTime = newWidth * audio?.duration;
-      // TODO: 设置歌词
+      setLyricHighLight();
     }
   };
 
@@ -709,8 +782,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
               </div>
               {showLyricMini && (
                 <div className="cool-lyric-mini-wrapper">
-                  {/* TODO: 小歌词 */}
-                  <span>小歌词</span>
+                  <LyricMini lyric={lyric || []} lyricIndex={lyricIndex} />
                 </div>
               )}
             </div>
@@ -872,6 +944,9 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
             </div>
           ) : null}
         </CSSTransitionGroup>
+
+        {/* 全屏弹窗 */}
+        <CSSTransitionGroup transitionName="cool-player-detail-show">{detailVisible && ''}</CSSTransitionGroup>
       </div>
     </div>
   );

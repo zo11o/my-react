@@ -194,6 +194,7 @@ function App() {
           }}
           lyric={lyric}
           showLyricMini={true}
+          lyricPlaceholder={'暂无歌词'}
         ></Player>
       </div>
     </div>

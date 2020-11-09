@@ -20,6 +20,7 @@ import {
   IconDelete,
 } from './icons';
 import LyricMini from '../../components/lyricMini';
+import LyricNormal from '../../components/lyricNormal';
 const { useState, useRef, useEffect } = React;
 const CSSTransitionGroup = require('react-addons-css-transition-group');
 
@@ -95,6 +96,8 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
   const [lyric, setLyric] = useState<coolPlayerTypes.ILyric[]>([]);
   const [lyricIndex, setLyricIndex] = useState<number>(-1);
 
+  const [lyricLoading, setLyricLoading] = useState<boolean>(false);
+
   const {
     icons = {},
     actions = [],
@@ -111,6 +114,7 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     onPlayDetailStatusChange,
     onPlayListStatusChange,
     onAudioChange,
+    lyricPlaceholder,
     playListPlaceholder = 'No Data',
     playListHeader = {
       headerLeft: 'Play List',
@@ -941,6 +945,17 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
                   <div className={'play-list-placeholder'}>{playListPlaceholder}</div>
                 )}
               </div>
+              {showLyricNormal && (
+                <LyricNormal
+                  lyric={lyric || []}
+                  lyricIndex={lyricIndex}
+                  tLyric={{}}
+                  info={currentMusic}
+                  loading={lyricLoading}
+                  lyricPlaceholder={lyricPlaceholder}
+                  primaryColor={primaryColor}
+                />
+              )}
             </div>
           ) : null}
         </CSSTransitionGroup>

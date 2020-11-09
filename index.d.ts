@@ -24,6 +24,7 @@ declare namespace coolPlayerTypes {
     playDetailShow?: boolean
     playListShow?: boolean
     playListPlaceholder?: string
+    lyricPlaceholder?: React.ReactElement | React.ReactNode | string
     // 异步加载歌词时，传入歌词数据
     lyric?: string
     zIndex?: number
@@ -103,6 +104,7 @@ declare namespace coolPlayerTypes {
   }
 
   interface ITLyric {
+    /* 时间： 歌词 */
     [key: number]: string
     [key: string]: string
   }
@@ -121,7 +123,16 @@ declare namespace coolPlayerTypes {
   }
 
   namespace lyricNormal {
-    
+    interface ILyricNormalProps {
+      lyric: ILyric[]
+      tLyric?: ITLyric;
+      /*与当前播放时间匹配的歌词index*/
+      lyricIndex: number;
+      info: IAudio
+      loading: boolean
+      lyricPlaceholder: React.ReactElement | React.ReactNode | string
+      primaryColor?: string
+    }
   }
 }
 

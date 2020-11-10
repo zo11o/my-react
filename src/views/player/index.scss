@@ -1,7 +1,6 @@
 @import '../../assets/styles/index.scss';
 
 #cool-player {
-  z-index: 1000;
   width: 100%;
   background: $white;
   position: relative;
@@ -14,6 +13,7 @@
 }
 
 .cool-player-wrapper {
+  z-index: 99999;
   width: 100%;
   height: 80px;
   background: $white;

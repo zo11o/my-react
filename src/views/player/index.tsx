@@ -680,12 +680,64 @@ const Player = (props: coolPlayerTypes.IPlayerProps) => {
     setMouseDown(false);
   };
 
-  const playThis = (index?: number) => {};
+  const playThis = (i: number) => {
+    if (data[i].disabled) {
+      return;
+    }
+    setCurrentMusic(data[i]);
+    play();
+  };
 
   /**
    * TODO: 详情删除歌曲
    */
-  const delMusic = (i: number, id: string) => {};
+  const delMusic = (i: number, id: string) => {
+    const audio = audioEl.current;
+    if (!audio) {
+      return;
+    }
+
+    if (!props.onDelete) {
+      return;
+    }
+
+    if (currentMusic && data[i] && data[i].src === currentMusic.src) {
+      if (i <= data.length - 1 && data[i + 1]) {
+        setCurrentMusic(data[i + 1]);
+      } else if (!data[i + 1] && data[i - 1]) {
+        // 删除最后一首
+        clearTimeout(rotateTimer);
+        setCurrentMusic(data[0]);
+      } else {
+        clearTimeout(rotateTimer);
+        audio.currentTime = 0;
+        if (bufferedEl.current) {
+          bufferedEl.current.style.width = '0';
+        }
+        // if (detailBufferedEl.current) {
+        //   detailBufferedEl.current.style.width = 0;
+        // }
+        if (playedEl.current) {
+          playedEl.current.style.width = '0';
+        }
+        // if (detailPlayedEl.current) {
+        //   detailPlayedEl.current.style.width = '0';
+        // }
+        const invalidCurrent = {
+          src: '',
+          artist: '',
+          name: '',
+          img: '',
+          id: '',
+        };
+        setCurrentMusic(invalidCurrent);
+        setIsPlayed(false);
+        setLyric([]);
+        // setTLyric({})
+        setLyricIndex(-1);
+      }
+    }
+  };
 
   const playMode = () => {};
 

@@ -40,6 +40,8 @@ declare namespace coolPlayerTypes {
       headerRight?: React.ReactNode | string
     }
     playListAudioActions?: Array<(data: IAudio, active?: boolean) => React.ReactNode>
+
+    onDelete?: (index: number, id: string) => void
     /*自定义图标*/
     icons?: {
       /*控制播放列表显示或隐藏的图标*/
